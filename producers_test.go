@@ -7,18 +7,28 @@ import (
 
 var testProducers = map[string]Producer{
 	"p0_AliYun1_QywxSync":{
+		Name: "p0_AliYun1_QywxSync",
 		ClusterName: "c0_AliYun1",
 		TopicName: "qywx-sync",
-		Options: map[string]string{
-			"":"",
-		},
 	},
 	"p0_AliYun1_User":{
+		Name: "p0_AliYun1_User",
 		ClusterName: "c0_AliYun1_user",
 		TopicName: "user",
-		Options: map[string]string{
-			"":"",
-		},
+
+	},
+}
+
+var testProducersList = []*Producer{
+	{
+		Name: "p0_AliYun1_QywxSync",
+		ClusterName: "c0_AliYun1",
+		TopicName: "qywx-sync",
+	},
+	{
+		Name: "p0_AliYun1_User",
+		ClusterName: "c0_AliYun1_user",
+		TopicName: "user",
 	},
 }
 

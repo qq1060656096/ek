@@ -3,6 +3,7 @@ package ek
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Shopify/sarama"
 	"math/rand"
 	"os"
 	"time"
@@ -26,6 +27,8 @@ type Event struct {
 	ForwardProducerName string `json:"forward"`
 	// 广播到某个生产者
 	BroadcastProducerName string `json:"broadcast"`
+	// 从那个生产者来
+	ProducerName string `json:"producer"`
 }
 
 func NewEventRaw(name string, key string, data interface{}, ip string, opTime int64) *Event {
@@ -45,6 +48,17 @@ func (e *Event) String() string {
 	return string(bytes)
 }
 
+func (e *Event) ToProducerMessage() *sarama.ProducerMessage {
+	msg := &sarama.ProducerMessage{
+		Topic: e.Name,
+		Value: sarama.StringEncoder(e.String()),
+	}
+	if e.Key != "" {
+		msg.Key = sarama.StringEncoder(e.Key)
+	}
+	return msg
+}
+
 // AppendAdditional 增加附加信息
 func (e *Event) AppendAdditional(additional EventAdditional) {
 	e.Additional = append(e.Additional, additional)
@@ -57,3 +71,4 @@ func GenerateEventId(ip string) string {
 	t := time.Now()
 	return fmt.Sprintf("%d-%d-%d-%d-%s", t.Unix(), t.Nanosecond(), os.Getpid(), rand.Uint32(), ip)
 }
+

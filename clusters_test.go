@@ -8,27 +8,50 @@ import (
 var testClusters = map[string]Cluster{
 	"c0_QywxApp":{
 		Name: "c0_QywxApp",
-		addrs: []string{
+		Addrs: []string{
 			"199.199.199.199:9092",
 			"127.0.0.1:9092",
 		},
 	},
 	"c0_AliYun1":{
 		Name: "c0_AliYun1",
-		addrs: []string{
+		Addrs: []string{
 			"199.199.199.199:9092",
 			"127.0.0.1:9092",
 		},
 	},
 	"c0_AliYun2":{
 		Name: "c0_AliYun2",
-		addrs: []string{
+		Addrs: []string{
 			"199.199.199.199:9092",
 			"127.0.0.1:9092",
 		},
 	},
 }
 
+var testClustersList = []*Cluster{
+	{
+		Name: "c0_QywxApp",
+		Addrs: []string{
+			"199.199.199.199:9092",
+			"127.0.0.1:9092",
+		},
+	},
+	{
+		Name: "c0_AliYun1",
+		Addrs: []string{
+			"199.199.199.199:9092",
+			"127.0.0.1:9092",
+		},
+	},
+	{
+		Name: "c0_AliYun2",
+		Addrs: []string{
+			"199.199.199.199:9092",
+			"127.0.0.1:9092",
+		},
+	},
+}
 func TestClusters_GetAll(t *testing.T) {
 	clusters := NewClusters()
 	assert.Equal(t, 0, len(clusters.GetAll()))
