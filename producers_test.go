@@ -9,15 +9,15 @@ import (
 
 var testProducers = []*Producer{
 	{
-		Name: "cAliYun_pBbsSync",
+		Name: "cAliYun_pBbs",
 		ClusterName: "cAliYun",
 		TopicName: "tBbs",
 		Config: &sarama.Config{},
 	},
 	{
-		Name: "cAliYun_pBbsSync",
+		Name: "cAliYun_pUser",
 		ClusterName: "cAliYun",
-		TopicName: "tBbs",
+		TopicName: "tUser",
 		Config: &sarama.Config{},
 	},
 }
@@ -30,10 +30,9 @@ func TestProducers_GetAll(t *testing.T) {
 func TestProducers_Set(t *testing.T) {
 	producers := NewProducers()
 	for _,v := range testProducers {
-		tmp := v
-		producers.Set(tmp)
+		producers.Set(v)
 	}
-	assert.LessOrEqual(t, 1, len(producers.GetAll()))
+	assert.Equal(t, len(testProducers), len(producers.GetAll()))
 }
 
 func TestProducers_Get(t *testing.T) {

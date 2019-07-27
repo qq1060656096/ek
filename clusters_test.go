@@ -33,7 +33,7 @@ func TestClusters_Set(t *testing.T) {
 		c := v
 		clusters.Set(c)
 	}
-	assert.Equal(t, 3, len(clusters.GetAll()))
+	assert.Equal(t, len(testClusters), len(clusters.GetAll()))
 }
 
 func TestClusters_Get(t *testing.T) {
