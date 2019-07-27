@@ -1,62 +1,47 @@
 package ek
 
 import (
+	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-var testProducers = map[string]Producer{
-	"p0_AliYun1_QywxSync":{
-		Name: "p0_AliYun1_QywxSync",
-		ClusterName: "c0_AliYun1",
-		TopicName: "qywx-sync",
-	},
-	"p0_AliYun1_User":{
-		Name: "p0_AliYun1_User",
-		ClusterName: "c0_AliYun1_user",
-		TopicName: "user",
 
-	},
-}
-
-var testProducersList = []*Producer{
+var testProducers = []*Producer{
 	{
-		Name: "p0_AliYun1_QywxSync",
-		ClusterName: "c0_AliYun1",
-		TopicName: "qywx-sync",
+		Name: "cAliYun_pBbsSync",
+		ClusterName: "cAliYun",
+		TopicName: "tBbs",
+		Config: &sarama.Config{},
 	},
 	{
-		Name: "p0_AliYun1_User",
-		ClusterName: "c0_AliYun1_user",
-		TopicName: "user",
+		Name: "cAliYun_pBbsSync",
+		ClusterName: "cAliYun",
+		TopicName: "tBbs",
+		Config: &sarama.Config{},
 	},
 }
 
 func TestProducers_GetAll(t *testing.T) {
 	producers := NewProducers()
 	assert.Equal(t, 0, len(producers.GetAll()))
-
-	for _,v := range testProducers {
-		tmp := v
-		producers.Set(&tmp)
-	}
 }
 
 func TestProducers_Set(t *testing.T) {
 	producers := NewProducers()
 	for _,v := range testProducers {
 		tmp := v
-		producers.Set(&tmp)
+		producers.Set(tmp)
 	}
 	assert.LessOrEqual(t, 1, len(producers.GetAll()))
 }
 
 func TestProducers_Get(t *testing.T) {
 	producers := NewProducers()
-	var tmp Producer
+	var tmp *Producer
 	for _,v := range testProducers {
 		tmp = v
-		producers.Set(&tmp)
+		producers.Set(tmp)
 	}
 	p, ok := producers.Get(tmp.Name)
 	assert.Equal(t, true, ok)
@@ -66,13 +51,8 @@ func TestProducers_Get(t *testing.T) {
 
 func TestProducers_SetAll(t *testing.T) {
 	producers := NewProducers()
-	var tmp Producer
-	var producersList []*Producer
-	for _,v := range testProducers {
-		tmp = v
-		producersList = append(producersList, &tmp)
-	}
-	producers.SetAll(producersList)
+	tmp := testProducers[0]
+	producers.SetAll(testProducers)
 	p, ok := producers.GetAll()[tmp.Name]
 	assert.Equal(t, true, ok)
 	assert.Equal(t, tmp.Name, p.Name)

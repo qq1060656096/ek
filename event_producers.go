@@ -4,28 +4,36 @@ import (
 	"github.com/Shopify/sarama"
 )
 
+func init()  {
+
+}
+
+// Default 默认 事件kafka生产者
+var Default *EventProducers
 
 // 事件生产者
-type EventKafkaProducers struct {
+type EventProducers struct {
 	producers Producers
 	clusters Clusters
 }
 
-// NewEventKafkaProducers 创建kafka事件生产者
-func NewEventKafkaProducers(producers Producers, clusters Clusters) *EventKafkaProducers {
-	return &EventKafkaProducers{
+
+
+// NewEventProducers 创建kafka事件生产者
+func NewEventProducers(producers Producers, clusters Clusters) *EventProducers {
+	return &EventProducers{
 		producers: producers,
 		clusters: clusters,
 	}
 }
 
 //  GetClient 创建kafka client
-func (ekp *EventKafkaProducers) GetClient(producerName string) (*sarama.Client, error) {
-	producer, ok := ekp.producers.Get(producerName)
+func (ep *EventProducers) GetClient(producerName string) (*sarama.Client, error) {
+	producer, ok := ep.producers.Get(producerName)
 	if !ok{
 		return nil, ErrProducerNotExist
 	}
-	cluster, ok := ekp.clusters.Get(producer.ClusterName)
+	cluster, ok := ep.clusters.Get(producer.ClusterName)
 	if !ok {
 		return nil, ErrClusterNotExist
 	}
@@ -40,8 +48,8 @@ func (ekp *EventKafkaProducers) GetClient(producerName string) (*sarama.Client, 
 }
 
 // GetNewSyncProducer 创建同步kafka生产者
-func (ekp *EventKafkaProducers) GetNewSyncProducer(producerName string) (*sarama.SyncProducer, error) {
-	client, err := ekp.GetClient(producerName)
+func (ep *EventProducers) GetNewSyncProducer(producerName string) (*sarama.SyncProducer, error) {
+	client, err := ep.GetClient(producerName)
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +61,8 @@ func (ekp *EventKafkaProducers) GetNewSyncProducer(producerName string) (*sarama
 }
 
 // GetNewAsyncProducer 创建异步kafka生产者
-func (ekp *EventKafkaProducers) GetNewAsyncProducer(producerName string) (*sarama.SyncProducer, error) {
-	client, err := ekp.GetClient(producerName)
+func (ep *EventProducers) GetNewAsyncProducer(producerName string) (*sarama.SyncProducer, error) {
+	client, err := ep.GetClient(producerName)
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +77,8 @@ func (ekp *EventKafkaProducers) GetNewAsyncProducer(producerName string) (*saram
 
 
 // SendSyncEvent 发送同步event
-func (ekp *EventKafkaProducers) SendSyncEvent (producerName string, syncProducer *sarama.SyncProducer, event Event) (partition int32, offset int64, err error) {
-	producer, ok := ekp.producers.Get(producerName)
+func (ep *EventProducers) SendSyncEvent (producerName string, syncProducer *sarama.SyncProducer, event Event) (partition int32, offset int64, err error) {
+	producer, ok := ep.producers.Get(producerName)
 	if !ok{
 		err = ErrProducerNotExist
 		return
@@ -80,8 +88,8 @@ func (ekp *EventKafkaProducers) SendSyncEvent (producerName string, syncProducer
 }
 
 // SendSyncEvents 发送同步events
-func (ekp *EventKafkaProducers) SendSyncEvents (producerName string, syncProducer *sarama.SyncProducer, events []Event) (err error) {
-	producer, ok := ekp.producers.Get(producerName)
+func (ep *EventProducers) SendSyncEvents (producerName string, syncProducer *sarama.SyncProducer, events []Event) (err error) {
+	producer, ok := ep.producers.Get(producerName)
 	if !ok{
 		err = ErrProducerNotExist
 		return
@@ -96,8 +104,8 @@ func (ekp *EventKafkaProducers) SendSyncEvents (producerName string, syncProduce
 
 
 // SendAsyncEvent 发送异步event
-func (ekp *EventKafkaProducers) SendAsyncEvent(producerName string, asyncProducer *sarama.AsyncProducer, event Event) (err error) {
-	producer, ok := ekp.producers.Get(producerName)
+func (ep *EventProducers) SendAsyncEvent(producerName string, asyncProducer *sarama.AsyncProducer, event Event) (err error) {
+	producer, ok := ep.producers.Get(producerName)
 	if !ok{
 		err = ErrProducerNotExist
 		return
@@ -108,8 +116,8 @@ func (ekp *EventKafkaProducers) SendAsyncEvent(producerName string, asyncProduce
 }
 
 // SendAsyncEvents 发送异步events
-func (ekp *EventKafkaProducers) SendAsyncEvents(producerName string, asyncProducer *sarama.AsyncProducer, events []Event) (err error) {
-	producer, ok := ekp.producers.Get(producerName)
+func (ep *EventProducers) SendAsyncEvents(producerName string, asyncProducer *sarama.AsyncProducer, events []Event) (err error) {
+	producer, ok := ep.producers.Get(producerName)
 	if !ok{
 		err = ErrProducerNotExist
 		return

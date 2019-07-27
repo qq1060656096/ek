@@ -14,6 +14,7 @@ const (
 )
 type EventAdditional[]interface{}
 
+// Event 事件对象
 type Event struct {
 	Id string `json:"id"`
 	Name string `json:"eventKey"`
@@ -31,6 +32,7 @@ type Event struct {
 	ProducerName string `json:"producer"`
 }
 
+// NewEventRaw 创建事件
 func NewEventRaw(name string, key string, data interface{}, ip string, opTime int64) *Event {
 	return &Event{
 		Id: GenerateEventId(ip),
@@ -43,11 +45,13 @@ func NewEventRaw(name string, key string, data interface{}, ip string, opTime in
 	}
 }
 
+// String 事件转换成string
 func (e *Event) String() string {
 	bytes, _ := json.Marshal(*e)
 	return string(bytes)
 }
 
+// ToProducerMessage 事件转ProducerMessage对象
 func (e *Event) ToProducerMessage() *sarama.ProducerMessage {
 	msg := &sarama.ProducerMessage{
 		Topic: e.Name,
@@ -72,3 +76,13 @@ func GenerateEventId(ip string) string {
 	return fmt.Sprintf("%d-%d-%d-%d-%s", t.Unix(), t.Nanosecond(), os.Getpid(), rand.Uint32(), ip)
 }
 
+// ConsumerMessageToEvent ConsumerMessageToEvent 对象转Event事件
+func ConsumerMessageToEvent(msg *sarama.ConsumerMessage) (*Event, error) {
+	event := &Event{
+	}
+	err := json.Unmarshal(msg.Value, event)
+	if err != nil {
+		return nil, err
+	}
+	return event, nil
+}
