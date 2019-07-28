@@ -37,7 +37,7 @@ func (ep *EventProducers) GetClient(producerName string) (*sarama.Client, error)
 	if !ok {
 		return nil, ErrClusterNotExist
 	}
-	if producer.Config == nil {
+	if producer.Client == nil {
 		client, err := sarama.NewClient(cluster.Addrs, producer.Config)
 		if err != nil {
 			return nil, err
@@ -77,18 +77,20 @@ func (ep *EventProducers) GetNewAsyncProducer(producerName string) (*sarama.Sync
 
 
 // SendSyncEvent 发送同步event
-func (ep *EventProducers) SendSyncEvent (producerName string, syncProducer *sarama.SyncProducer, event Event) (partition int32, offset int64, err error) {
+func (ep *EventProducers) SendSyncEvent (producerName string, syncProducer *sarama.SyncProducer, event *Event) (partition int32, offset int64, err error) {
 	producer, ok := ep.producers.Get(producerName)
 	if !ok{
 		err = ErrProducerNotExist
 		return
 	}
 	event.ProducerName = producer.Name
-	return (*syncProducer).SendMessage(event.ToProducerMessage())
+	msg := event.ToProducerMessage()
+	msg.Topic = producer.TopicName
+	return (*syncProducer).SendMessage(msg)
 }
 
 // SendSyncEvents 发送同步events
-func (ep *EventProducers) SendSyncEvents (producerName string, syncProducer *sarama.SyncProducer, events []Event) (err error) {
+func (ep *EventProducers) SendSyncEvents (producerName string, syncProducer *sarama.SyncProducer, events []*Event) (err error) {
 	producer, ok := ep.producers.Get(producerName)
 	if !ok{
 		err = ErrProducerNotExist
@@ -97,7 +99,9 @@ func (ep *EventProducers) SendSyncEvents (producerName string, syncProducer *sar
 	var msgs []*sarama.ProducerMessage
 	for _, event := range events {
 		event.ProducerName = producer.Name
-		msgs = append(msgs, event.ToProducerMessage())
+		msg := event.ToProducerMessage()
+		msg.Topic = producer.TopicName
+		msgs = append(msgs, msg)
 	}
 	return (*syncProducer).SendMessages(msgs)
 }
