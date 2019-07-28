@@ -23,7 +23,7 @@ func bTestNewEventProducers(t *testing.T) {
 	//ep.SendSyncEvent(producerName, syncProducer, *e)
 }
 
-func GetTestProducersClusters() (* Producers, *Clusters) {
+func GetTestConfigProducersClusters() (* Producers, *Clusters) {
 	producerList := []*Producer{
 		{
 			Name: "c0DockerKafkaCluster_p0DockerKafkaProducer",
@@ -52,14 +52,14 @@ func GetTestProducersClusters() (* Producers, *Clusters) {
 }
 
 func TestNewEventProducers(t *testing.T) {
-	producers, clusters := GetTestProducersClusters()
+	producers, clusters := GetTestConfigProducersClusters()
 	eventProducers := NewEventProducers(*producers, *clusters)
 	_ , err := eventProducers.GetNewSyncProducer("c0DockerKafkaCluster_p0DockerKafkaProducer")
 	assert.Equal(t, nil, err)
 }
 
 func TestEventProducers_SendSyncEvent(t *testing.T) {
-	producers, clusters := GetTestProducersClusters()
+	producers, clusters := GetTestConfigProducersClusters()
 	eventProducers := NewEventProducers(*producers, *clusters)
 	syncProducer , err := eventProducers.GetNewSyncProducer("c0DockerKafkaCluster_p0DockerKafkaProducer")
 	assert.Equal(t, nil, err)
@@ -69,7 +69,7 @@ func TestEventProducers_SendSyncEvent(t *testing.T) {
 }
 
 func TestEventProducers_SendSyncEvents(t *testing.T) {
-	producers, clusters := GetTestProducersClusters()
+	producers, clusters := GetTestConfigProducersClusters()
 	eventProducers := NewEventProducers(*producers, *clusters)
 	syncProducer , err := eventProducers.GetNewSyncProducer("c0DockerKafkaCluster_p0DockerKafkaProducer")
 	assert.Equal(t, nil, err)
