@@ -1,6 +1,7 @@
 # ek(Event Kafka)
 
 ## 生产者发送消息
+**生产者配置**
 ```go
 producerList := []*Producer{
     {
@@ -26,6 +27,11 @@ clusterList := []*Cluster{
 }
 clusters := NewClusters()
 clusters.SetAll(clusterList)
+```
+**生产者发送消息**
+```go
+// 请看测试文件: event_producers_test.go
+eventProducers := NewEventProducers(*producers, *clusters)
 var events []*Event
 events = make([]*Event, 2)
 events[0] = NewEventRaw("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1}, "", 0)
