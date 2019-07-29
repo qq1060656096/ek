@@ -1,7 +1,6 @@
 package ek
 
 import (
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"runtime"
@@ -32,11 +31,7 @@ func GetTestConfigProducersClusters() (* Producers, *Clusters) {
 			Name: "c0DockerKafkaCluster_p0DockerKafkaProducer",
 			ClusterName: "c0DockerKafkaCluster",
 			TopicName: "test",
-			Config: func() *sarama.Config{
-				config := sarama.NewConfig()
-				config.Producer.Return.Successes = true
-				return config
-			}(),
+			Config: NewSyncProducerDefaultConfig(),
 		},
 		{
 			Name: "c0DockerKafkaCluster_p0DockerKafkaAsyncProducer",// 异步生产者
@@ -86,10 +81,8 @@ func TestEventProducers_SendSyncEvents(t *testing.T) {
 	syncProducer , err := eventProducers.GetNewSyncProducer("c0DockerKafkaCluster_p0DockerKafkaProducer")
 	assert.Equal(t, nil, err)
 	var events []*Event
-	ip := "127.0.0.1"
-	var opTime int64 = 1564045436// 2019-07-25 17:03:56
 	events = make([]*Event, 2)
-	events[0] = NewEventRaw("UserRegisterBatchEventSyncSend", "", map[string]interface{}{"a": 1}, ip, opTime)
+	events[0] = NewEvent("UserRegisterBatchEventSyncSend", "", map[string]interface{}{"a": 1})
 	events[1] = NewEvent("UserRegisterBatchEventSyncSend", "", map[string]interface{}{"a": 2})
 	err = eventProducers.SendSyncEvents("c0DockerKafkaCluster_p0DockerKafkaProducer", syncProducer, events)
 	assert.Equal(t, nil, err)
@@ -100,9 +93,7 @@ func TestEventProducers_SendAsyncEvent(t *testing.T) {
 	eventProducers := NewEventProducers(*producers, *clusters)
 	asyncProducer , err := eventProducers.GetNewAsyncProducer("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer")
 	assert.Equal(t, nil, err)
-	ip := "127.0.0.1"
-	var opTime int64 = 1564045436// 2019-07-25 17:03:56
-	event := NewEventRaw("UserRegisterEventAsyncSend", "", map[string]interface{}{"a": 1}, ip, opTime)
+	event := NewEvent("UserRegisterEventAsyncSend", "", map[string]interface{}{"a": 1})
 	err = eventProducers.SendAsyncEvent("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer", asyncProducer, event)
 	for {
 		runtime.Gosched()
@@ -124,10 +115,8 @@ func TestEventProducers_SendAsyncEvents(t *testing.T) {
 	eventProducers := NewEventProducers(*producers, *clusters)
 	asyncProducer , err := eventProducers.GetNewAsyncProducer("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer")
 	assert.Equal(t, nil, err)
-	ip := "127.0.0.1"
-	var opTime int64 = 1564045436// 2019-07-25 17:03:56
 	var events = make([]*Event, 2)
-	events[0] = NewEventRaw("UserRegisterBatchEventAsyncSend", "", map[string]interface{}{"async": 21}, ip, opTime)
+	events[0] = NewEvent("UserRegisterBatchEventAsyncSend", "", map[string]interface{}{"async": 21})
 	events[1] = NewEvent("UserRegisterBatchEventAsyncSend", "", map[string]interface{}{"async": 22})
 	err = eventProducers.SendAsyncEvents("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer", asyncProducer, events)
 	for {

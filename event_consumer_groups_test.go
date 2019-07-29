@@ -14,12 +14,7 @@ func GetTestConfigConsumerGroupsClusters() ( *ConsumerGroups, *Clusters) {
 			GroupName: "c0DockerKafkaCluster_g0DockerKafkaConsumerGroups",
 			ClusterName: "c0DockerKafkaCluster",
 			TopicsName: []string{"test"},
-			Config: func() *sarama.Config {
-				config := sarama.NewConfig()
-				config.Version = sarama.V1_0_0_0
-				config.Consumer.Return.Errors = true
-				return config
-			}(),
+			Config: NewConsumerGroupDefaultConfig(),
 			EventConsumerGroupHandler: EventConsumerGroupHandler{
 				EventConsumeFunc: map[string]EventConsumeFunc{
 					"UserRegisterSyncSend": func(msg *sarama.ConsumerMessage, event *Event) {
