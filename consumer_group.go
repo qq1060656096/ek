@@ -9,7 +9,7 @@ type ConsumerGroup struct {
 	ClusterName string
 	Client *sarama.Client
 	Config *sarama.Config
-	EventConsumerGroupHandler *EventConsumerGroupHandler
+	EventConsumerGroupHandler EventConsumerGroupHandler
 	// 转发到某个生产者
 	ForwardProducerName string `json:"forward"`
 	// 广播到来源生产者

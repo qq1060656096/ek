@@ -39,7 +39,7 @@ events[1] = NewEvent("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1
 // 批量发送消息
 err = eventProducers.SendSyncEvents("c0DockerKafkaCluster_p0DockerKafkaProducer", syncProducer, events)
 // 发送单条消息
-event := NewEventRaw("UserRegister", "", map[string]interface{}{"a": 1}, "", 0)
+event := NewEvent("UserRegister", "", map[string]interface{}{"a": 1})
 _, _, err = eventProducers.SendSyncEvent("c0DockerKafkaCluster_p0DockerKafkaProducer", syncProducer, event)
 
 ```

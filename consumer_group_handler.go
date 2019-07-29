@@ -36,13 +36,14 @@ func (o EventConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession
 		if err != nil {
 
 		}
-		eventConsumefunc, ok := o.EventConsumeFunc[event.Name]
+		eventConsumeFunc, ok := o.EventConsumeFunc[event.Name]
 		// 没有配置事件
 		if !ok {
-
+			fmt.Println("consumer_group event no config", event.Name)
+			continue
 		}
 		// 消费事件
-		eventConsumefunc(t, event)
+		eventConsumeFunc(t, event)
 
 		fmt.Printf("Message topic:%q partition:%d offset:%d\n", msg.Topic, msg.Partition, msg.Offset)
 		// 标记消息已经消费

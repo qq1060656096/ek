@@ -33,7 +33,7 @@ func (ecg *EventConsumerGroups) GetClient(consumerName string) (*sarama.Client, 
 	if !ok {
 		return nil, ErrClusterNotExist
 	}
-	if consumer.Config == nil {
+	if consumer.Client == nil {
 		client, err := sarama.NewClient(cluster.Addrs, consumer.Config)
 		if err != nil {
 			return nil, err
@@ -63,7 +63,7 @@ func (ecg *EventConsumerGroups) GetNewConsumerGroup(consumerName string) (*saram
 
 
 // ConsumeEvent 消费者消费事件(注意会堵塞)
-func (ecg *EventConsumerGroups) ConsumeEvent (consumerName string, consumerGroup *sarama.ConsumerGroup, event Event) error {
+func (ecg *EventConsumerGroups) ConsumeEvent (consumerName string, consumerGroup *sarama.ConsumerGroup) error {
 	consumer, ok := ecg.consumerGroups.Get(consumerName)
 	if !ok{
 		return ErrClusterNotExist
