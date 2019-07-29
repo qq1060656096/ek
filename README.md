@@ -78,14 +78,16 @@ clusters.SetAll(clusterList)
 
 **消费者消费**
 ```go
-
-```
 // 创建消费组
 consumerGroups := NewEventConsumerGroups(*consumers, *clusters)
 // 创建单个消费者
 consumerGroup, err := consumerGroups.GetNewConsumerGroup("c0DockerKafkaCluster_g0DockerKafkaConsumerGroups")
 // 消费消息
 consumerGroups.ConsumeEvent("c0DockerKafkaCluster_g0DockerKafkaConsumerGroups", consumerGroup)
+
+```
+
+**单元测试**
 ```
 # 单元测试
 GO111MODULE=on GOPROXY=https://goproxy.io go test -v
