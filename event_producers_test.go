@@ -3,7 +3,10 @@ package ek
 import (
 	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+	"log"
+	"runtime"
 	"testing"
+	"time"
 )
 
 func bTestNewEventProducers(t *testing.T) {
@@ -35,6 +38,12 @@ func GetTestConfigProducersClusters() (* Producers, *Clusters) {
 				return config
 			}(),
 		},
+		{
+			Name: "c0DockerKafkaCluster_p0DockerKafkaAsyncProducer",// 异步生产者
+			ClusterName: "c0DockerKafkaCluster",
+			TopicName: "test",
+			Config: nil,
+		},
 	}
 	producers := NewProducers()
 	producers.SetAll(producerList)
@@ -51,6 +60,7 @@ func GetTestConfigProducersClusters() (* Producers, *Clusters) {
 	return producers ,clusters
 }
 
+
 func TestNewEventProducers(t *testing.T) {
 	producers, clusters := GetTestConfigProducersClusters()
 	eventProducers := NewEventProducers(*producers, *clusters)
@@ -63,7 +73,9 @@ func TestEventProducers_SendSyncEvent(t *testing.T) {
 	eventProducers := NewEventProducers(*producers, *clusters)
 	syncProducer , err := eventProducers.GetNewSyncProducer("c0DockerKafkaCluster_p0DockerKafkaProducer")
 	assert.Equal(t, nil, err)
-	event := NewEventRaw("UserRegister", "", map[string]interface{}{"a": 1}, "", 0)
+	ip := "127.0.0.1"
+	var opTime int64 = 1564045436// 2019-07-25 17:03:56
+	event := NewEventRaw("UserRegisterSyncSend", "", map[string]interface{}{"a": 1}, ip, opTime)
 	_, _, err = eventProducers.SendSyncEvent("c0DockerKafkaCluster_p0DockerKafkaProducer", syncProducer, event)
 	assert.Equal(t, nil, err)
 }
@@ -74,9 +86,61 @@ func TestEventProducers_SendSyncEvents(t *testing.T) {
 	syncProducer , err := eventProducers.GetNewSyncProducer("c0DockerKafkaCluster_p0DockerKafkaProducer")
 	assert.Equal(t, nil, err)
 	var events []*Event
+	ip := "127.0.0.1"
+	var opTime int64 = 1564045436// 2019-07-25 17:03:56
 	events = make([]*Event, 2)
-	events[0] = NewEventRaw("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1}, "", 0)
-	events[1] = NewEventRaw("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1}, "", 0)
+	events[0] = NewEventRaw("UserRegisterBatchEventSyncSend", "", map[string]interface{}{"a": 1}, ip, opTime)
+	events[1] = NewEvent("UserRegisterBatchEventSyncSend", "", map[string]interface{}{"a": 2})
 	err = eventProducers.SendSyncEvents("c0DockerKafkaCluster_p0DockerKafkaProducer", syncProducer, events)
+	assert.Equal(t, nil, err)
+}
+
+func TestEventProducers_SendAsyncEvent(t *testing.T) {
+	producers, clusters := GetTestConfigProducersClusters()
+	eventProducers := NewEventProducers(*producers, *clusters)
+	asyncProducer , err := eventProducers.GetNewAsyncProducer("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer")
+	assert.Equal(t, nil, err)
+	ip := "127.0.0.1"
+	var opTime int64 = 1564045436// 2019-07-25 17:03:56
+	event := NewEventRaw("UserRegisterEventAsyncSend", "", map[string]interface{}{"a": 1}, ip, opTime)
+	err = eventProducers.SendAsyncEvent("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer", asyncProducer, event)
+	for {
+		runtime.Gosched()
+		select {
+		case err := <-(*asyncProducer).Errors():
+			log.Println("Failed to produce message", err)
+			assert.Equal(t, nil, err)
+		default:
+		}
+		time.Sleep(time.Millisecond * 100)
+		runtime.Gosched()
+		break
+	}
+	assert.Equal(t, nil, err)
+}
+
+func TestEventProducers_SendAsyncEvents(t *testing.T) {
+	producers, clusters := GetTestConfigProducersClusters()
+	eventProducers := NewEventProducers(*producers, *clusters)
+	asyncProducer , err := eventProducers.GetNewAsyncProducer("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer")
+	assert.Equal(t, nil, err)
+	ip := "127.0.0.1"
+	var opTime int64 = 1564045436// 2019-07-25 17:03:56
+	var events = make([]*Event, 2)
+	events[0] = NewEventRaw("UserRegisterBatchEventAsyncSend", "", map[string]interface{}{"async": 21}, ip, opTime)
+	events[1] = NewEvent("UserRegisterBatchEventAsyncSend", "", map[string]interface{}{"async": 22})
+	err = eventProducers.SendAsyncEvents("c0DockerKafkaCluster_p0DockerKafkaAsyncProducer", asyncProducer, events)
+	for {
+		runtime.Gosched()
+		select {
+		case err := <-(*asyncProducer).Errors():
+			log.Println("Failed to produce message", err)
+			assert.Equal(t, nil, err)
+		default:
+		}
+		time.Sleep(time.Millisecond * 100)
+		runtime.Gosched()
+		break
+	}
 	assert.Equal(t, nil, err)
 }

@@ -4,14 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Shopify/sarama"
+	"log"
 	"math/rand"
 	"os"
 	"time"
+	"github.com/qq1060656096/go-develop/pkg/ip"
 )
 
 const (
 	EventVersionDefault = "0"
 )
+var localIp *ip.Ip
+
 type EventAdditional[]interface{}
 
 // Event 事件对象
@@ -32,14 +36,28 @@ type Event struct {
 	ProducerName string `json:"producer"`
 }
 
+
+func init() {
+	var err error
+	localIp, err = ip.New()
+	if err != nil {
+		log.Println("package.ek.event.init.error: ",err)
+	}
+}
+
+func NewEvent(name string, key string, data interface{}) *Event {
+	ipAddr := localIp.IpAddr()
+	return NewEventRaw(name, key, data, ipAddr, time.Now().Unix())
+}
+
 // NewEventRaw 创建事件
-func NewEventRaw(name string, key string, data interface{}, ip string, opTime int64) *Event {
+func NewEventRaw(name string, key string, data interface{}, ipAddr string, opTime int64) *Event {
 	return &Event{
-		Id: GenerateEventId(ip),
+		Id: GenerateEventId(ipAddr),
 		Name: name,
 		Key: key,
 		Version: EventVersionDefault,
-		Ip: ip,
+		Ip: ipAddr,
 		Time: opTime,
 		Data: data,
 	}
