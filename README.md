@@ -34,8 +34,8 @@ clusters.SetAll(clusterList)
 eventProducers := NewEventProducers(*producers, *clusters)
 var events []*Event
 events = make([]*Event, 2)
-events[0] = NewEventRaw("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1}, "", 0)
-events[1] = NewEventRaw("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1}, "", 0)
+events[0] = NewEvent("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1})
+events[1] = NewEvent("UserRegisterBatchEvent", "", map[string]interface{}{"a": 1})
 // 批量发送消息
 err = eventProducers.SendSyncEvents("c0DockerKafkaCluster_p0DockerKafkaProducer", syncProducer, events)
 // 发送单条消息
