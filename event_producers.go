@@ -83,6 +83,12 @@ func (ep *EventProducers) SendSyncEvent (producerName string, syncProducer *sara
 		err = ErrProducerNotExist
 		return
 	}
+	if syncProducer == nil {
+		syncProducer, err = ep.GetNewSyncProducer(producerName)
+		if err != nil {
+			return 0 , 0, err
+		}
+	}
 	event.ProducerName = producer.Name
 	msg := event.ToProducerMessage()
 	msg.Topic = producer.TopicName
@@ -95,6 +101,12 @@ func (ep *EventProducers) SendSyncEvents (producerName string, syncProducer *sar
 	if !ok{
 		err = ErrProducerNotExist
 		return
+	}
+	if syncProducer == nil {
+		syncProducer, err = ep.GetNewSyncProducer(producerName)
+		if err != nil {
+			return err
+		}
 	}
 	var msgs []*sarama.ProducerMessage
 	for _, event := range events {
@@ -114,6 +126,12 @@ func (ep *EventProducers) SendAsyncEvent(producerName string, asyncProducer *sar
 		err = ErrProducerNotExist
 		return
 	}
+	if asyncProducer == nil {
+		asyncProducer, err = ep.GetNewAsyncProducer(producerName)
+		if err != nil {
+			return err
+		}
+	}
 	event.ProducerName = producer.Name
 	msg := event.ToProducerMessage()
 	msg.Topic = producer.TopicName
@@ -128,6 +146,12 @@ func (ep *EventProducers) SendAsyncEvents(producerName string, asyncProducer *sa
 		err = ErrProducerNotExist
 		return
 	}
+
+	asyncProducer, err = ep.GetNewAsyncProducer(producerName)
+	if err != nil {
+		return err
+	}
+
 	for _, event := range events {
 		msg := &sarama.ProducerMessage{
 			Topic: producer.TopicName,

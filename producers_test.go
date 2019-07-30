@@ -1,7 +1,6 @@
 package ek
 
 import (
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -12,13 +11,13 @@ var testProducers = []*Producer{
 		Name: "cAliYun_pBbs",
 		ClusterName: "cAliYun",
 		TopicName: "tBbs",
-		Config: &sarama.Config{},
+		Config: NewSyncProducerDefaultConfig(),
 	},
 	{
 		Name: "cAliYun_pUser",
 		ClusterName: "cAliYun",
 		TopicName: "tUser",
-		Config: &sarama.Config{},
+		Config: NewAsyncProducerDefaultConfig(),
 	},
 }
 

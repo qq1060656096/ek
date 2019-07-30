@@ -8,23 +8,6 @@ import (
 	"time"
 )
 
-func bTestNewEventProducers(t *testing.T) {
-
-	//producers := NewProducers()
-	//producers.SetAll(testProducersList)
-	//clusters := NewClusters()
-	//clusters.SetAll(testClustersList)
-	//
-	//ep := NewEventProducers(*producers, *clusters)
-	//e := NewEventRaw("UserRegistr", "", make(map[string]string), ip.IpAddr(), time.Now().Unix())
-	//producerName := "p0_aliyun_qywxSync"
-	//syncProducer,err := ep.GetNewSyncProducer(producerName)
-	//if err != nil {
-	//
-	//}
-	//ep.SendSyncEvent(producerName, syncProducer, *e)
-}
-
 func GetTestConfigProducersClusters() (* Producers, *Clusters) {
 	producerList := []*Producer{
 		{
@@ -37,7 +20,7 @@ func GetTestConfigProducersClusters() (* Producers, *Clusters) {
 			Name: "c0DockerKafkaCluster_p0DockerKafkaAsyncProducer",// 异步生产者
 			ClusterName: "c0DockerKafkaCluster",
 			TopicName: "test",
-			Config: nil,
+			Config: NewAsyncProducerDefaultConfig(),
 		},
 	}
 	producers := NewProducers()

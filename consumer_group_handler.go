@@ -5,7 +5,7 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-type EventConsumeFunc func (msg *sarama.ConsumerMessage, event *Event)
+type EventConsumeFunc func (msg sarama.ConsumerMessage, event Event)
 
 type EventConsumeResult struct {
 	Status string
@@ -43,7 +43,7 @@ func (o EventConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession
 			continue
 		}
 		// 消费事件
-		eventConsumeFunc(t, event)
+		eventConsumeFunc(*t, *event)
 
 		fmt.Printf("Message topic:%q partition:%d offset:%d\n", msg.Topic, msg.Partition, msg.Offset)
 		// 标记消息已经消费
